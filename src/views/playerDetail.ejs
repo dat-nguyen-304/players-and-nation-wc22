@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./common/head.ejs') %>
+    <style>
+        .modal-body {
+            display: flex;
+            width: 1200px;
+            margin: 0 auto;
+        }
+
+        .player-img {
+            width: 300px;
+            object-fit: contain;
+        }
+
+        label {
+            width: 200px;
+        }
+
+        p {
+            display: inline-block;
+            margin: 0;
+            font-size: 1.6rem;
+        }
+
+        .player-content {
+            margin-left: 300px;
+        }
+
+        .flag {
+            width: 50px;
+        }
+
+        .title {
+            padding-top: 32px;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <div class="back-btn">
+                    <a href="#" onclick="window.history.back()" type=" submit" class="Btn Btn--gray">Back</a>
+                </div>
+                <div class="course">
+                    <h2 class="content-heading title">
+                        <%= player.name %>
+                    </h2>
+
+                    <div class="modal-body">
+                        <img class="player-img" src="<%= player.image %>" <div class="modal-footer">
+                        <div class="player-content">
+                            <div class="mb-4 one-line">
+                                <label>Country:</label>
+                                <p>
+                                    <%= player.nation.name %>
+                                </p>
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Flag:</label>
+                                <img class="flag" src="<%= player.nation.image %>" />
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Position:</label>
+                                <p>
+                                    <%= player.position %>
+                                </p>
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Goals:</label>
+                                <p>
+                                    <%= player.goals %>
+                                </p>
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Captian:</label>
+                                <p>
+                                    <%= player.isCaptain ? 'YES' : 'NO' %>
+                                </p>
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Current club:</label>
+                                <p>
+                                    <%= player.club %>
+                                </p>
+                            </div>
+                            <div class="mb-4 one-line">
+                                <label>Description:</label>
+                                <p style="font-style: italic; color: #666;">
+                                    <%= player.description %>
+                                </p>
+                            </div>
+                        </div>
+
+                    </div>
+                </div>
+        </div>
+    </body>
+
+</html>

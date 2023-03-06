@@ -1,0 +1,321 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./common/head.ejs') %>
+    <style>
+        .modal-body {
+            font-size: 1.6rem;
+        }
+
+        .course-item {
+            margin-top: 60px;
+            color: #64ffda;
+        }
+
+        #main {
+            padding-bottom: 100px;
+        }
+
+        .preview-image {
+            width: 100%;
+            object-fit: cover;
+            display: flex;
+            justify-content: center;
+        }
+
+        .player-message {
+            width: 40%;
+            margin: 30px auto 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <% if (role==='admin' ) { %>
+                    <div class="toggle-modal">
+                        <button class="circle-btn" data-bs-toggle="modal" data-bs-target="#addPlayer"
+                            data-bs-whatever="@mdo">
+                            <span class="plus-icon">+</span>
+                        </button>
+                        <div class="modal fade" id="addPlayer" tabindex="-1" aria-labelledby="addPlayerLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addPlayerLabel">Add new player</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <form action="/players" method="post" enctype="multipart/form-data">
+                                        <div class="modal-body" style="width: 600px;">
+                                            <div class="preview-image">
+
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Name:</label>
+                                                <input required type="text" name="name" class="form-control"
+                                                    id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Goals:</label>
+                                                <input required type="number" name="goals" class="form-control"
+                                                    id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Description:</label>
+                                                <input required type="text" class="form-control" name="description"
+                                                    id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Image:</label>
+                                                <input required type="file" onchange="previewImage(this)" name="image"
+                                                    class="form-control" id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Nation:</label>
+                                                <select required name="nation" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <% nations.map(nation=> { %>
+                                                        <option value="<%= nation.id %>">
+                                                            <%= nation.name %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Club:</label>
+                                                <select required name="club" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <% clubs.map(club=> { %>
+                                                        <option value="<%= club %>">
+                                                            <%= club %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Position:</label>
+                                                <select required name="position" class="form-select"
+                                                    aria-label="Default select example">
+                                                    <% positions.map(position=> { %>
+                                                        <option value="<%= position %>">
+                                                            <%= position %>
+                                                        </option>
+                                                        <% }) %>
+                                                </select>
+                                            </div>
+                                            <div class="mb-3">
+                                                <input class="form-check-input" name="isCaptain" type="checkbox" value=1
+                                                    id="isCaptian">
+                                                <label class="form-check-label" for="isCaptian">
+                                                    Captain
+                                                </label>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="Btn Btn--gray"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="Btn Btn--primary">Add new player</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="deletePlayer" data-bs-backdrop="static" data-bs-keyboard="false"
+                            tabindex="-1" aria-labelledby="deletePlayerLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deletePlayerLabel">Confirm delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="Btn Btn--gray"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <form action="" method="POST" id="linkDelete">
+                                            <button class="Btn Btn--danger">Yes, I sure</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <div class="course">
+                            <h2 class="content-heading">Players</h2>
+                            <% if (message) { %>
+                                <div class="alert alert-danger player-message" role="alert">
+                                    <%= message %>
+                                </div>
+                                <% } %>
+                                    <form method="GET" style="display: flex; margin-top: 60px !important; width: 80%;">
+                                        <input type="hidden" name="page" value="<%= page %>" />
+                                        <input placeholder="Search by player name" type="text" class="form-control"
+                                            name="keyword" value="<%= keyword %>"
+                                            style="border-radius: 40px; margin-right: 20px; border: 1px solid #5a73fc;" />
+                                        <button class="Btn Btn--primary">Search</button>
+                                    </form>
+                                    <ul class="course__list row" style="margin-top: 0px">
+                                        <% if (players.length===0) { %>
+                                            <div class="alert alert-danger player-message" role="alert">
+                                                No player found
+                                            </div>
+                                            <% } %>
+                                                <% players.map(player=> { %>
+                                                    <li class="col l-2-4 m-12 c-12">
+                                                        <div class="course-item">
+
+                                                            <div class="course-card course-card--front">
+                                                                <div
+                                                                    class="course-card__picture course-card__picture--1">
+                                                                    <!-- style="background-image:  url('<%= player.image %>')" -->
+                                                                    <img style="object-fit: contain;
+                                            width: 100%;
+                                            display: block;
+                                            height: 100%;" data-src="<%= player.image %>" />
+                                                                </div>
+                                                                <div class="course-card__position">
+                                                                    <span>
+                                                                        <%= player.position %>
+                                                                    </span>
+                                                                </div>
+                                                                <% if (player.isCaptain) {%>
+                                                                    <div class="course-card__captain">
+                                                                        <div>C</div>
+                                                                    </div>
+                                                                    <% } %>
+                                                                        <div class="course-card-content">
+                                                                            <div class="course-card-content__item">
+                                                                                <%= player.name %>
+                                                                            </div>
+                                                                            <div class="course-card-content__item">
+                                                                                <span>
+                                                                                    <%= player.nation.name %>
+                                                                                </span>
+                                                                                <img data-src="<%= player.nation.image %>"
+                                                                                    alt="" />
+                                                                            </div>
+
+                                                                        </div>
+                                                            </div>
+                                                            <div class="course-card course-card--back">
+                                                                <div class="course-card-back" style="display: flex;">
+                                                                    <div class="course-card-back__description">
+                                                                        <p>
+                                                                            <%= player.description%>
+                                                                        </p>
+                                                                    </div>
+                                                                    <div class="course-card-back__player-detail">
+                                                                        <a href="/players/<%= player._id %>"
+                                                                            style="font-size: 12px;"
+                                                                            class="course-enroll-btn Btn Btn--gray Btn-player-detail">DETAIL</a>
+                                                                    </div>
+                                                                    <% if (role==='admin' ) { %>
+                                                                        <div class="course-card-back__player-action">
+                                                                            <a href="/players/update-player/<%= player._id %>"
+                                                                                style="font-size: 12px;"
+                                                                                class="course-enroll-btn Btn Btn--warning Btn-player-action">EDIT</a>
+                                                                            <button value="<%= player._id %>"
+                                                                                style="font-size: 12px;"
+                                                                                class="course-enroll-btn Btn Btn--danger Btn-player-action"
+                                                                                data-bs-toggle="modal"
+                                                                                onclick="onClick(event)"
+                                                                                data-bs-target="#deletePlayer">DELETE</button>
+                                                                        </div>
+                                                                        <% } %>
+                                                                </div>
+                                                            </div>
+                                                        </div>
+                                                    </li>
+                                                    <% }) %>
+                                    </ul>
+                                    <% if (totalPage> 1) { %>
+                                        <ul class="pagination">
+                                            <% for (let i=1;i<=totalPage;i++) { %>
+                                                <% if (page!=i) { %>
+                                                    <li>
+                                                        <% if (keyword==='' ) { %>
+                                                            <a href="/players?page=<%= i%>">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } %>
+                                                                <% if (keyword !=='' ) { %>
+                                                                    <a
+                                                                        href="/players?page=<%= i %>&keyword=<%= keyword %>">
+                                                                        <%= i %>
+                                                                    </a>
+                                                                    <% } %>
+                                                    </li>
+                                                    <% } %>
+                                                        <% if (page==i) { %>
+                                                            <li class="page-selected">
+                                                                <% if (keyword==='' ) { %>
+                                                                    <a href="/players?page=<%= i%>">
+                                                                        <%= i %>
+                                                                    </a>
+                                                                    <% } %>
+                                                                        <% if (keyword !=='' ) { %>
+                                                                            <a
+                                                                                href="/players?page=<%= i %>&keyword=<%= keyword %>">
+                                                                                <%= i %>
+                                                                            </a>
+                                                                            <% } %>
+                                                            </li>
+                                                            <% } %>
+                                                                <% } %>
+                                        </ul>
+                                        <% } %>
+                        </div>
+        </div>
+    </body>
+    <script>
+        function onClick (event) {
+            const id = event.target.value;
+            const linkDelete = document.querySelector('#linkDelete');
+            linkDelete.action = `/players/${id}?_method=DELETE`;
+        }
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Load the image or other resource
+                    entry.target.src = entry.target.dataset.src;
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const images = document.querySelectorAll('img[data-src]');
+
+        images.forEach(img => {
+            observer.observe(img);
+        });
+    </script>
+    <script>
+        function previewImage (input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var element = document.querySelector('.preview-image');
+                    var imgPreview = document.createElement('img');
+                    imgPreview.src = e.target.result;
+                    element.innerHTML = "";
+                    element.style.height = '100px';
+                    element.appendChild(imgPreview);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+</html>

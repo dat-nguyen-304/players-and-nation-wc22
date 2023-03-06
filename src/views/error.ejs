@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./common/head.ejs') %>
+    <style>
+        .modal-body {
+            font-size: 1.6rem;
+        }
+
+        .course-item {
+            margin-top: 60px;
+            color: #64ffda;
+        }
+
+        #main {
+            padding-bottom: 100px;
+        }
+
+        .preview-image {
+            width: 100%;
+            object-fit: cover;
+            display: flex;
+            justify-content: center;
+        }
+
+        .player-message {
+            width: 40%;
+            margin: 30px auto 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <div class="alert alert-danger"
+                    style="margin: 40px 25% 0; font-size: 1.6rem; text-align: center; width: 50%;" role="alert">
+                    <%= message %>
+                </div>
+        </div>
+    </body>
+
+</html>

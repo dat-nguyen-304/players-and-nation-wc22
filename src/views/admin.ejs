@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./common/head.ejs') %>
+    <style>
+        #users {
+            font-family: Arial, Helvetica, sans-serif;
+            border-collapse: collapse;
+            width: 100%;
+            font-size: 1.6rem;
+            margin: 40px 10% 0;
+            width: 80%;
+        }
+
+        #users td,
+        #users th {
+            border: 1px solid #ddd;
+            padding: 8px;
+            text-align: center !important;
+        }
+
+        #users tr:nth-child(even) {
+            background-color: #f2f2f2;
+        }
+
+        #users tr:hover {
+            background-color: #ddd;
+        }
+
+        #users th {
+            padding-top: 12px;
+            padding-bottom: 12px;
+            text-align: left;
+            background-color: #5a73fc;
+            color: white;
+        }
+
+        #users img {
+            width: 40px;
+            height: 40px;
+            display: block;
+            margin: 0 auto;
+            object-fit: cover;
+        }
+
+        .account-message {
+            width: 40%;
+            margin: 30px auto 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <h2 class="content-heading" style="margin: 40px auto;">Accounts</h2>
+                <form method="GET" style="display: flex; margin-top: 60px !important; width: 80%;">
+                    <input type="hidden" name="page" value="<%= page %>" />
+                    <input type="text" class="form-control" name="keyword" placeholder="Search by name"
+                        value="<%= keyword %>"
+                        style="border-radius: 40px; margin-right: 20px; border: 1px solid #5a73fc;" />
+                    <button class="Btn Btn--primary">Search</button>
+                </form>
+                <table id="users">
+                    <% if (users.length===0) { %>
+                        <div class="alert alert-danger account-message" role="alert">
+                            No user found
+                        </div>
+                        <% } %>
+                            <% if (users.length!==0) { %>
+                                <tr>
+                                    <th>Image</th>
+                                    <th>Username</th>
+                                    <th>Name</th>
+                                    <th>YOB</th>
+                                    <th>Created At</th>
+                                </tr>
+                                <% } %>
+
+                                    <% users.map(user=> { %>
+                                        <tr>
+                                            <td><img src="<%= user.image %>" /></td>
+                                            <td>
+                                                <%= user.username %>
+                                            </td>
+                                            <td>
+                                                <%= user.name %>
+                                            </td>
+                                            <td>
+                                                <%= user.YOB %>
+                                            </td>
+                                            <% const date=new Date(user.createdAt) ; const day=date.getDate(); const
+                                                month=date.getMonth() + 1; const year=date.getFullYear(); %>
+                                                <td>
+                                                    <%= `${day}/${month}/${year}` %>
+                                                </td>
+
+                                        </tr>
+                                        <% }) %>
+                </table>
+                <% if (totalPage> 1) { %>
+                    <ul class="pagination">
+                        <% for (let i=1;i<=totalPage;i++) { %>
+                            <% if (page!=i) { %>
+                                <li>
+                                    <% if (keyword==='' ) { %>
+                                        <a href="/accounts?page=<%= i%>">
+                                            <%= i %>
+                                        </a>
+                                        <% } %>
+                                            <% if (keyword !=='' ) { %>
+                                                <a href="/accounts?page=<%= i %>&keyword=<%= keyword %>">
+                                                    <%= i %>
+                                                </a>
+                                                <% } %>
+                                </li>
+                                <% } %>
+                                    <% if (page==i) { %>
+                                        <li class="page-selected">
+                                            <% if (keyword==='' ) { %>
+                                                <a href="/accounts?page=<%= i%>">
+                                                    <%= i %>
+                                                </a>
+                                                <% } %>
+                                                    <% if (keyword !=='' ) { %>
+                                                        <a href="/accounts?page=<%= i %>&keyword=<%= keyword %>">
+                                                            <%= i %>
+                                                        </a>
+                                                        <% } %>
+                                        </li>
+                                        <% } %>
+                                            <% } %>
+                    </ul>
+                    <% } %>
+        </div>
+    </body>
+
+</html>

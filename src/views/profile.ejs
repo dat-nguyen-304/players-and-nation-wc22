@@ -1,0 +1,198 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<%- include('./common/head.ejs') %>
+    <style>
+        .user-container {
+            display: flex;
+            justify-content: center;
+            margin-top: 40px;
+        }
+
+        .user-img {
+            flex: 1;
+            width: 240px;
+            height: 240px;
+            object-fit: contain;
+            border-top: 1px solid #5a73fc;
+            border-right: 1px solid #5a73fc;
+            padding: 20px;
+
+        }
+
+        .user-content {
+            flex: 1;
+            border-top: 1px solid #5a73fc;
+            padding-left: 20px;
+            padding-top: 20px;
+        }
+
+        .profile-button {
+            margin-top: 24px;
+            display: flex;
+            justify-content: center;
+        }
+
+        .Btn-profile {
+            margin: 20px;
+        }
+
+        span {
+            font-size: 28px;
+            margin-left: 12px;
+        }
+
+        .preview-image {
+            width: 100%;
+            height: 100px;
+            object-fit: cover;
+            display: flex;
+            justify-content: center;
+        }
+
+        .profile-message {
+            width: 480px;
+            margin: 0 auto;
+            font-size: 1.6rem;
+            margin-top: 24px;
+            text-align: center;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <div class="back-btn">
+                    <a href="/" type="submit" class="Btn Btn--gray">Back</a>
+                </div>
+                <div class="course">
+                    <h2 class="content-heading title">
+                        profile
+                    </h2>
+                    <% if (message) { %>
+                        <div class="alert alert-danger profile-message" role="alert">
+                            <%= message %>
+                        </div>
+                        <% } %>
+                            <div class="user-container">
+
+                                <img class="user-img" src="<%= user.image %>" <div class="modal-footer">
+                                <div class="user-content">
+                                    <div class="mb-4 one-line">
+                                        <label>Name:</label>
+                                        <span>
+                                            <%= user.name %>
+                                        </span>
+                                    </div>
+                                    <div class="mb-4 one-line">
+                                        <label>Year of birth:</label>
+                                        <span>
+                                            <%= user.YOB %>
+                                        </span>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="profile-button">
+                                <button class="Btn Btn--primary Btn-profile" data-bs-toggle="modal"
+                                    data-bs-target="#updateProfile" data-bs-whatever="@mdo">Update Profile</button>
+                                <button class="Btn Btn--primary Btn-profile" data-bs-toggle="modal"
+                                    data-bs-target="#changePassword" data-bs-whatever="@mdo">Change Password</button>
+                            </div>
+                </div>
+        </div>
+        <div class="modal fade" id="updateProfile" tabindex="-1" aria-labelledby="updateProfileLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="updateProfileLabel">Update profile</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="/profile?_method=put" method="post" enctype="multipart/form-data">
+                        <div class="modal-body" style="width: 600px;">
+                            <div class="preview-image">
+                                <img src="<%= user.image %>" />
+                            </div>
+                            <input type="hidden" name="_id" value="<%= user._id %>" />
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">Image
+                                    URL:</label>
+                                <input type="file" onchange="previewImage(this)" name="image" class="form-control"
+                                    id="recipient-name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">Name:</label>
+                                <input required value="<%= user.name %>" type="text" name="name" class="form-control"
+                                    id="recipient-name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">Year of birth:</label>
+                                <input required value="<%= user.YOB %>" type="number" name="YOB" class="form-control"
+                                    id="recipient-name">
+                            </div>
+
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="Btn Btn--gray" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="Btn Btn--primary">Update</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+        <div class="modal fade" id="changePassword" tabindex="-1" aria-labelledby="changePasswordLabel"
+            aria-hidden="true">
+            <div class="modal-dialog modal-lg">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <h5 class="modal-title" id="changePasswordLabel">Change password</h5>
+                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <form action="/change-password?_method=put" method="post">
+                        <div class="modal-body" style="width: 600px;">
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">Current password:</label>
+                                <input required type="password" name="password" class="form-control"
+                                    id="recipient-name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">New password:</label>
+                                <input required type="password" name="newPassword" class="form-control"
+                                    id="recipient-name">
+                            </div>
+                            <div class="mb-3">
+                                <label for="recipient-name" class="col-form-label">Confirm password:</label>
+                                <input required type="password" name="confirmPassword" class="form-control"
+                                    id="recipient-name">
+                            </div>
+                        </div>
+                        <div class="modal-footer">
+                            <button type="button" class="Btn Btn--gray" data-bs-dismiss="modal">Close</button>
+                            <button type="submit" class="Btn Btn--primary">Change</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </body>
+    <script>
+        function previewImage (input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var element = document.querySelector('.preview-image');
+                    var imgPreview = document.createElement('img');
+                    imgPreview.src = e.target.result;
+                    element.innerHTML = "";
+                    element.style.height = '100px';
+                    element.appendChild(imgPreview);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+</html>

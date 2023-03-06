@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./common/head.ejs') %>
+    <style>
+        .modal-body {
+            font-size: 1.6rem;
+        }
+
+        .course-item {
+            margin-top: 60px;
+        }
+
+        #main {
+            padding-bottom: 100px;
+        }
+
+        .preview-image {
+            width: 100%;
+            object-fit: cover;
+            display: flex;
+            justify-content: center;
+        }
+
+        .nation-message {
+            width: 40%;
+            margin: 30px auto 0;
+            font-size: 1.6rem;
+            text-align: center;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <% if (role==='admin' ) { %>
+                    <div class="toggle-modal">
+                        <button class="circle-btn" data-bs-toggle="modal" data-bs-target="#addNation"
+                            data-bs-whatever="@mdo">
+                            <span class="plus-icon">+</span>
+                        </button>
+                        <div class="modal fade " id="addNation" tabindex="-1" aria-labelledby="addNationLabel"
+                            aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="addNationLabel">Add new nation</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <form action="/nations" method="post" enctype="multipart/form-data">
+                                        <div class="modal-body" style="width: 600px;">
+                                            <div class="preview-image">
+
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Name:</label>
+                                                <input required type="text" name="name" class="form-control"
+                                                    id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Description:</label>
+                                                <input required type="text" class="form-control" name="description"
+                                                    id="recipient-name">
+                                            </div>
+                                            <div class="mb-3">
+                                                <label for="recipient-name" class="col-form-label">Image</label>
+                                                <input required type="file" onchange="previewImage(this)" name="image"
+                                                    id="recipient-name">
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="Btn Btn--gray"
+                                                data-bs-dismiss="modal">Close</button>
+                                            <button type="submit" class="Btn Btn--primary">Add Nation</button>
+                                        </div>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="modal fade" id="deleteNation" data-bs-backdrop="static" data-bs-keyboard="false"
+                            tabindex="-1" aria-labelledby="deleteNationLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="deleteNationLabel">Confirm delete</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal"
+                                            aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        Are you sure?
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" class="Btn Btn--gray"
+                                            data-bs-dismiss="modal">Close</button>
+                                        <form action="" method="POST" id="linkDelete">
+                                            <button class="Btn Btn--danger">Yes, I sure</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <% } %>
+
+                        <div class="course">
+                            <h2 class="content-heading">
+                                Nations
+                            </h2>
+                            <form method="GET" style="display: flex; margin-top: 60px !important; width: 80%;">
+                                <input type="hidden" name="page" value="<%= page %>" />
+                                <input placeholder="Search by nation name" type="text" class="form-control"
+                                    name="keyword" value="<%= keyword %>"
+                                    style="border-radius: 40px; margin-right: 20px; border: 1px solid #5a73fc;" />
+                                <button class="Btn Btn--primary">Search</button>
+                            </form>
+                            <ul class="course__list row">
+                                <% if (nations.length===0) { %>
+                                    <div class="alert alert-danger nation-message" role="alert">
+                                        No nation found
+                                    </div>
+                                    <% } %>
+                                        <% nations.map(nation=> { %>
+                                            <li class="col l-2 m-12 c-12">
+                                                <div class="course-item nation">
+                                                    <div class="course-card nation course-card--front">
+                                                        <div class="course-card__picture nation">
+                                                            <!-- style="background-image:  url('<%= nation.image %>')" -->
+                                                            <img style="object-fit: cover;
+                                            width: 100%;
+                                            display: block;border-radius: 2rem;
+                                            height: 100%;" data-src="<%= nation.image %>" />
+                                                        </div>
+                                                        <div class="course-card-content" style="padding-top: 4px;">
+                                                            <div class="course-card-content__item">
+                                                                <%= nation.name %>
+                                                            </div>
+                                                        </div>
+                                                    </div>
+                                                    <div class="course-card nation course-card--back">
+                                                        <div class="course-card-back course-card-back-nation">
+                                                            <% if (role==='user' ) { %>
+                                                                <div class="course-card-back__description nation">
+                                                                    <p>
+                                                                        <%= nation.description %>
+                                                                    </p>
+                                                                </div>
+                                                                <% } %>
+                                                                    <div class="course-card-back__enroll">
+                                                                        <a href="/nations/<%= nation._id %>"
+                                                                            style="font-size: 10px;"
+                                                                            class="course-enroll-btn Btn Btn--primary Btn-nation">Detail</a>
+                                                                    </div>
+                                                                    <% if (role==='admin' ) { %>
+                                                                        <div class="course-card-back__enroll">
+                                                                            <a href="/nations/update-nation/<%= nation._id %>"
+                                                                                style="font-size: 10px;"
+                                                                                class="course-enroll-btn Btn Btn--warning Btn-nation">Edit</a>
+                                                                        </div>
+                                                                        <div class="course-card-back__enroll">
+                                                                            <button value="<%= nation._id %>"
+                                                                                style="font-size: 10px;"
+                                                                                class="course-enroll-btn Btn Btn--danger Btn-nation"
+                                                                                data-bs-toggle="modal"
+                                                                                onclick="onClick(event)"
+                                                                                data-bs-target="#deleteNation">DELETE</button>
+                                                                        </div>
+                                                                        <% }%>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </li>
+                                            <% }) %>
+                            </ul>
+                            <% if (totalPage> 1) { %>
+                                <ul class="pagination">
+                                    <% for (let i=1;i<=totalPage;i++) { %>
+                                        <% if (page!=i) { %>
+                                            <li>
+                                                <% if (keyword==='' ) { %>
+                                                    <a href="/nations?page=<%= i%>">
+                                                        <%= i %>
+                                                    </a>
+                                                    <% } %>
+                                                        <% if (keyword !=='' ) { %>
+                                                            <a href="/nations?page=<%= i %>&keyword=<%= keyword %>">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } %>
+                                            </li>
+                                            <% } %>
+                                                <% if (page==i) { %>
+                                                    <li class="page-selected">
+                                                        <% if (keyword==='' ) { %>
+                                                            <a href="/nations?page=<%= i%>">
+                                                                <%= i %>
+                                                            </a>
+                                                            <% } %>
+                                                                <% if (keyword !=='' ) { %>
+                                                                    <a
+                                                                        href="/nations?page=<%= i %>&keyword=<%= keyword %>">
+                                                                        <%= i %>
+                                                                    </a>
+                                                                    <% } %>
+                                                    </li>
+                                                    <% } %>
+                                                        <% } %>
+                                </ul>
+                                <% } %>
+                        </div>
+        </div>
+    </body>
+    <script>
+        function onClick (event) {
+            const id = event.target.value;
+            const linkDelete = document.querySelector('#linkDelete');
+            linkDelete.action = `/nations/${id}?_method=DELETE`;
+        }
+
+        const observer = new IntersectionObserver((entries, observer) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    // Load the image or other resource
+                    entry.target.src = entry.target.dataset.src;
+                    observer.unobserve(entry.target);
+                }
+            });
+        }, { threshold: 0.1 });
+
+        const images = document.querySelectorAll('img[data-src]');
+
+        images.forEach(img => {
+            observer.observe(img);
+        });
+    </script>
+    <script>
+        function previewImage (input) {
+            if (input.files && input.files[0]) {
+                var reader = new FileReader();
+
+                reader.onload = function (e) {
+                    var element = document.querySelector('.preview-image');
+                    var imgPreview = document.createElement('img');
+                    imgPreview.src = e.target.result;
+                    element.innerHTML = "";
+                    element.style.height = '100px';
+                    element.appendChild(imgPreview);
+                }
+
+                reader.readAsDataURL(input.files[0]);
+            }
+        }
+    </script>
+
+</html>

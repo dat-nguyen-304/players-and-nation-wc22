@@ -1,0 +1,23 @@
+<div class="menu">
+    <input type="checkbox" id="menu-check-box" class="menu__check-box"></input>
+    <label for="menu-check-box" class="menu__btn">
+        <div class="menu-btn-icon"></div>
+    </label>
+
+    <div class="menu__nav">
+        <ul class="menu__list">
+            <li class="menu__item"><a class="menu__link" href="/">home</a></li>
+            <% if (role==='admin' ) { %>
+                <li class="menu__item"><a class="menu__link" href="/accounts">users</a></li>
+                <% } %>
+                    <li class="menu__item"><a class="menu__link" href="/about-us">about us</a></li>
+                    <li class="menu__item"><a class="menu__link" href="/players">players</a></li>
+                    <li class="menu__item"><a class="menu__link" href="/nations">nations</a></li>
+                    <li class="menu__item"><a class="menu__link" href="/profile">profile</a></li>
+                    <li class="menu__item"><a class="menu__link" href="/auth/logout">logout</a></li>
+        </ul>
+    </div>
+
+    <div class="menu__bg">
+    </div>
+</div>

@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<%- include('./common/head.ejs') %>
+    <style>
+        .modal-body {
+            display: flex;
+            width: 1200px;
+            margin: 0 auto;
+        }
+
+        .nation-img {
+            width: 300px;
+            box-shadow: 0 0 5px #ccc;
+        }
+
+        label {
+            width: 200px;
+        }
+
+        p {
+            font-style: italic;
+            display: inline-block;
+            margin: 0;
+            font-size: 1.6rem;
+            color: #666;
+        }
+
+        .nation-content {
+            margin-left: 200px;
+        }
+
+        .title {
+            padding-top: 32px;
+        }
+    </style>
+
+    <body>
+        <div id="main">
+            <%- include('./common/menu.ejs') %>
+                <div class="course">
+                    <div class="back-btn">
+                        <a href="#" onclick="window.history.back()" type=" submit" class="Btn Btn--gray">Back</a>
+                    </div>
+                    <h2 class="content-heading title">
+                        <%= nation.name %>
+                    </h2>
+
+                    <div class="modal-body">
+                        <img class="nation-img" src="<%= nation.image %>" <div class="modal-footer">
+                        <div class="nation-content">
+                            <div class="mb-4 one-line">
+                                <p>
+                                    <%= nation.description %>
+                                </p>
+                            </div>
+
+                        </div>
+                    </div>
+                </div>
+        </div>
+    </body>
+
+</html>
