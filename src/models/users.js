@@ -7,7 +7,10 @@ const userSchema = new Schema({
     name: { type: String, require: true },
     image: { type: String, require: true },
     YOB: { type: Number, require: true },
-    isAdmin: { type: Boolean, default: false }
+    isAdmin: { type: Boolean, default: false },
+    token: { type: String },
+    tokenExpiredTime: { type: Date },
+    tokenStatus: { type: Boolean },
 }, { timestamps: true, }
 );
 var Users = mongoose.model("users", userSchema);

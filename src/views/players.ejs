@@ -157,9 +157,9 @@
                                 </div>
                                 <% } %>
                                     <form method="GET" style="display: flex; margin-top: 60px !important; width: 80%;">
-                                        <input type="hidden" name="page" value="<%= page %>" />
+                                        <!-- <input type="hidden" name="page" value="<%= page %>" /> -->
                                         <input placeholder="Search by player name" type="text" class="form-control"
-                                            name="keyword" value="<%= keyword %>"
+                                            id="keyword" name="keyword" value="<%= keyword %>" onkeyup="searchByName()"
                                             style="border-radius: 40px; margin-right: 20px; border: 1px solid #5a73fc;" />
                                         <button class="Btn Btn--primary">Search</button>
                                     </form>
@@ -172,7 +172,6 @@
                                                 <% players.map(player=> { %>
                                                     <li class="col l-2-4 m-12 c-12">
                                                         <div class="course-item">
-
                                                             <div class="course-card course-card--front">
                                                                 <div
                                                                     class="course-card__picture course-card__picture--1">
@@ -237,8 +236,8 @@
                                                     </li>
                                                     <% }) %>
                                     </ul>
-                                    <% if (totalPage> 1) { %>
-                                        <ul class="pagination">
+                                    <ul class="pagination">
+                                        <% if (totalPage> 1) { %>
                                             <% for (let i=1;i<=totalPage;i++) { %>
                                                 <% if (page!=i) { %>
                                                     <li>
@@ -271,11 +270,13 @@
                                                             </li>
                                                             <% } %>
                                                                 <% } %>
-                                        </ul>
-                                        <% } %>
+                                                                    <% } %>
+
+                                    </ul>
                         </div>
         </div>
     </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
         function onClick (event) {
             const id = event.target.value;
@@ -315,6 +316,126 @@
 
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+        function searchByName () {
+            const keyword = document.querySelector('#keyword').value;
+            jQuery.ajax({
+                type: 'GET',
+                data: { 'keyword': keyword },
+                url: '/api/players',
+                success: function (players) {
+                    let html = '';
+                    console.log(players.totalPage);
+
+                    for (let i = 0; i < players.players.length; i++) {
+                        let player = players.players[i];
+                        html +=
+                            `<li class="col l-2-4 m-12 c-12">
+                                <div class="course-item">
+                                    <div class="course-card course-card--front">
+                                        <div class="course-card__picture course-card__picture--1">
+                                            <img style="object-fit: contain;
+                                            width: 100%;
+                                            display: block;
+                                            height: 100%;" src="${player.image}" />
+                                        </div>
+                                        <div class="course-card__position">
+                                            <span>
+                                                ${player.position}
+                                            </span>
+                                        </div>`;
+
+                        if (player.isCaptain)
+                            html += `
+                                <div class="course-card__captain">
+                                    <div>C</div>
+                                </div>`
+                        html += `
+                                <div class="course-card-content" >
+                                    <div class="course-card-content__item">
+                                        ${player.name}
+                                    </div>
+                                    <div class="course-card-content__item">
+                                        <span>
+                                            ${player.nation.name}
+                                        </span>
+                                        <img src="${player.nation.image}"
+                                            alt="" />
+                                    </div>
+                                </div >
+                            </div >
+                            <div class="course-card course-card--back">
+                                <div class="course-card-back" style="display: flex;">
+                                    <div class="course-card-back__description">
+                                        <p>
+                                            ${player.description}
+                                        </p>
+                                    </div>
+                                    <div class="course-card-back__player-detail">
+                                        <a href="/players/${player._id}"
+                                            style="font-size: 12px;"
+                                            class="course-enroll-btn Btn Btn--gray Btn-player-detail">DETAIL</a>
+                                    </div>`;
+
+                        if (players.role === 'admin') html += `
+                                                                        <div class="course-card-back__player-action">
+                                                                            <a href="/players/update-player/${player._id}"
+                                                                                style="font-size: 12px;"
+                                                                                class="course-enroll-btn Btn Btn--warning Btn-player-action">EDIT</a>
+                                                                            <button value="${player._id}"
+                                                                                style="font-size: 12px;"
+                                                                                class="course-enroll-btn Btn Btn--danger Btn-player-action"
+                                                                                data-bs-toggle="modal"
+                                                                                onclick="onClick(event)"
+                                                                                data-bs-target="#deletePlayer">DELETE</button>
+                                                                        </div>
+                                                                       `
+                        html += `
+                                        </div>
+                                    </div>
+                                </div >
+                             </li >`
+                    }
+                    // console.log("html: ", html);
+                    const listElement = document.querySelector('.course__list.row');
+                    if (html)
+                        listElement.innerHTML = html;
+                    else listElement.innerHTML = `
+                    <div class="alert alert-danger player-message" role="alert">No player found</div>`;
+
+                    let paginationHtml = '';
+                    for (let i = 1; i <= players.totalPage; i++) {
+
+                        if (players.page != i) {
+                            paginationHtml += `<li>`;
+
+
+                            if (keyword === '')
+                                paginationHtml += `<a href="/players?page=${i}">${i}</a></li>`;
+                            if (keyword !== '')
+                                paginationHtml +=
+                                    ` <a href="/players?page=${i}&keyword=${players.keyword}">${i}</a></li>`
+                        }
+                        if (players.page == i) {
+                            paginationHtml +=
+                                `<li class="page-selected">`
+                            if (keyword === '')
+                                paginationHtml += `<a href="/players?page=${i}">${i}</a></li>`;
+                            if (keyword !== '')
+                                paginationHtml += `<a href="/players?page=${i}&keyword=${players.keyword}">${i}</a></li>`;
+
+                        }
+                    }
+
+                    const pagination = document.querySelector('.pagination');
+                    if (players.totalPage > 1) pagination.innerHTML = paginationHtml;
+                    else pagination.innerHTML = '';
+                },
+                error: function () {
+                },
+                complete: function (result) {
+                }
+            });
         }
     </script>
 

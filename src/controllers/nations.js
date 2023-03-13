@@ -36,6 +36,39 @@ export const getAllNations = async (req, res) => {
   res.status
 }
 
+export const getAllNationsAjax = async (req, res) => {
+  try {
+    if (req.role === 'guest') {
+      return res.render('login', { username: '', message: 'You must login to see nations' });
+    }
+    const item = 3;
+    let page = req.query.page ? req.query.page : 1;
+    const keyword = req.query.keyword ? req.query.keyword : '';
+    const totalItem = await Nations.countDocuments({ name: { $regex: keyword, $options: 'i' } });
+    const totalPage = Math.ceil(totalItem / item);
+    if (page > totalPage) page = totalPage;
+    if (page < 1) page = 1;
+
+    let nations;
+    if (!keyword)
+      nations = await Nations.find()
+        .skip((page - 1) * item)
+        .limit(item)
+        .sort({ createdAt: -1 });
+    else
+      nations = await Nations
+        .find({ name: { $regex: keyword, $options: 'i' } })
+        .skip((page - 1) * item)
+        .limit(item)
+        .sort({ createdAt: -1 });
+
+    res.status(200).json({ nations, role: req.role, page, keyword, totalPage });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
 export const addNation = async (req, res) => {
   try {
     const checkExistName = await Nations.findOne({ name: req.body.name }).lean();

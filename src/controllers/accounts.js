@@ -1,6 +1,10 @@
 const Users = require("../models/users");
+import { v4 as uuidv4 } from 'uuid';
+import nodemailer from 'nodemailer';
 const fs = require('fs');
 const path = require('path');
+require('dotenv').config();
+
 export const getProfile = async (req, res) => {
     try {
         if (req.role === 'guest') return res.redirect("/login-page");
@@ -80,3 +84,49 @@ export const getAccounts = async (req, res) => {
     }
 };
 
+export const createForgotPasswordLink = async (req, res) => {
+    try {
+        let user = await Users.findOne({ username: req.body.username });
+        if (!user) {
+            return res.render("forgotPassword", { message: 'Email is incorrect. Please try again!', username: req.body.username });
+        } else {
+            let token = uuidv4(); // ⇨ '9b1deb4d-3b7d-4bad-9bdd-2b0d7b3dcb6d'
+            user.token = token;
+            user.tokenExpiredTime = (new Date()).getTime() + 60 * 1000;
+            user.tokenStatus = true;
+
+            await user.save();
+
+            const resetLink = `http://localhost:5000/reset-password/${token}`;
+            await sendResetEmail(user.username, user.name, resetLink);
+            return res.redirect("/check-email");
+        }
+    } catch (e) {
+        res.status(500).json(e);
+    }
+}
+
+
+let sendResetEmail = async (username, name, resetLink) => {
+    let transporter = nodemailer.createTransport({
+        host: "smtp.gmail.com",
+        port: 587,
+        secure: false, // true for 465, false for other ports
+        auth: {
+            user: process.env.EMAIL_APP, // generated ethereal user
+            pass: process.env.EMAIL_APP_PASSWORD, // generated ethereal password
+        },
+    });
+
+    // send mail with defined transport object
+    let info = await transporter.sendMail({
+        from: 'World cup 2022', // sender address
+        to: username, // list of receivers
+        subject: "Reset password world cup 2022", // Subject line
+        html: `<h3>Hello ${name}!</h3>
+        <p>You received password reset email from world cup 2022</p>
+        <p>If you really want to reset password, please click the link below</p>
+        <div><a href="${resetLink}" target"_blank">Click here (Expire within 1 minute)</a></div >
+        <div>Best regards.</div>`
+    });
+}

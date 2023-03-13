@@ -12,7 +12,7 @@ var indexRouter = require("./routes/index");
 var nationRouter = require("./routes/nationRouter");
 var playerRouter = require("./routes/playerRouter");
 var authRouter = require("./routes/authRouter");
-
+var apiRouter = require("./routes/apiRouter");
 
 var app = express();
 
@@ -30,6 +30,7 @@ app.use("/", indexRouter);
 app.use("/nations", nationRouter);
 app.use("/players", playerRouter);
 app.use("/auth", authRouter);
+app.use("/api", apiRouter);
 
 const url = "mongodb://127.0.0.1:27017/assignment2";
 const connectDB = () => {

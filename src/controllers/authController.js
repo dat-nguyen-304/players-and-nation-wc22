@@ -21,7 +21,7 @@ export const register = async (req, res) => {
 
             bcrypt.hash(req.body.password, saltRounds, function (err, hash) {
                 req.body.password = hash;
-                const user = new Users({ ...req.body, image: `./default-avt.jpg` });
+                const user = new Users({ ...req.body, image: `./default-avt.jpg`, token: null, tokenExpiredTime: null, tokenStatus: null });
                 user.save();
                 res.render("register", { message: 'Register successful', type: 'success', username: '', password: '', confirmPassword: '', name: '', YOB: '' });
             });
@@ -123,6 +123,63 @@ export const registerPage = (req, res) => {
         if (req.role === 'guest')
             res.render("register", { message: '', username: '', password: '', confirmPassword: '', name: '', YOB: '', type: '' });
         else res.redirect("/")
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+export const forgotPasswordPage = (req, res) => {
+    try {
+        res.render("forgotPassword", { message: '', username: req.body.username });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+export const checkEmailPage = (req, res) => {
+    try {
+        res.render("checkEmail");
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+export const resetPasswordPage = async (req, res) => {
+    try {
+        const user = await Users.findOne({ token: req.params.token });
+        if (!user) return res.render("error404");
+
+        const expiredTime = user.tokenExpiredTime;
+        if (expiredTime < (new Date()).getTime()) {
+            return res.render("error", { message: 'Your link is expired!' });
+        }
+        return res.render("resetPassword", { message: '', newPassword: '', token: req.params.token, password: '' });
+    } catch (err) {
+        res.status(500).json(err);
+    }
+}
+
+export const resetPassword = async (req, res) => {
+    try {
+        const { token, newPassword, confirmPassword } = req.body;
+        const user = await Users.findOne({ token });
+        if (!user) return res.render("error404");
+
+        const expiredTime = user.tokenExpiredTime;
+        if (expiredTime < (new Date()).getTime()) {
+            return res.render("error", { message: 'Your link is expired!' });
+        }
+        if (newPassword.length < 6)
+            return res.render("resetPassword", { token, newPassword, message: 'New password must be at least 6 characters' });
+
+        if (confirmPassword !== newPassword)
+            return res.render("resetPassword", { token, newPassword, message: 'Confirm password must be equal to new password' });
+
+        bcrypt.hash(newPassword, saltRounds, async function (err, hash) {
+            user.password = hash;
+            await user.save();
+            return res.render("login", { username: user.username, message: 'Change password success!' });
+        });
     } catch (err) {
         res.status(500).json(err);
     }

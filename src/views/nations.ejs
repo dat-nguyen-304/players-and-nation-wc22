@@ -107,9 +107,8 @@
                                 Nations
                             </h2>
                             <form method="GET" style="display: flex; margin-top: 60px !important; width: 80%;">
-                                <input type="hidden" name="page" value="<%= page %>" />
-                                <input placeholder="Search by nation name" type="text" class="form-control"
-                                    name="keyword" value="<%= keyword %>"
+                                <input placeholder="Search by nation name" type="text" class="form-control" id="keyword"
+                                    name="keyword" value="<%= keyword %>" onkeyup="searchByName()"
                                     style="border-radius: 40px; margin-right: 20px; border: 1px solid #5a73fc;" />
                                 <button class="Btn Btn--primary">Search</button>
                             </form>
@@ -209,6 +208,7 @@
                         </div>
         </div>
     </body>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.6.3/jquery.min.js"></script>
     <script>
         function onClick (event) {
             const id = event.target.value;
@@ -248,6 +248,107 @@
 
                 reader.readAsDataURL(input.files[0]);
             }
+        }
+
+        function searchByName () {
+            const keyword = document.querySelector('#keyword').value;
+            jQuery.ajax({
+                type: 'GET',
+                data: { 'keyword': keyword },
+                url: '/api/nations',
+                success: function (nations) {
+                    let html = '';
+
+                    for (let i = 0; i < nations.nations.length; i++) {
+                        const nation = nations.nations[i];
+                        html += `<li class="col l-2 m-12 c-12">
+                                    <div class="course-item nation">
+                                        <div class="course-card nation course-card--front">
+                                            <div class="course-card__picture nation">
+                                                <img style="object-fit: cover; width: 100%; display: block;border-radius: 2rem;height: 100%;" src="${nation.image}" />
+                                            </div>
+                                            <div class="course-card-content" style="padding-top: 4px;">
+                                                <div class="course-card-content__item">
+                                                    ${nation.name}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="course-card nation course-card--back">
+                                            <div class="course-card-back course-card-back-nation">`;
+                        if (nations.role === 'user') html +=
+                            `<div class="course-card-back__description nation">
+                                <p>
+                                    ${nation.description}
+                                </p>
+                            </div>`
+                        html +=
+                            `<div class="course-card-back__enroll" >
+                                <a href="/nations/${nation._id}"
+                                    style="font-size: 10px;"
+                                    class="course-enroll-btn Btn Btn--primary Btn-nation">Detail
+                                </a>
+                            </div>`;
+                        if (nations.role === 'admin') html +=
+                            `<div class="course-card-back__enroll">
+                                <a href="/nations/update-nation/${nation._id}" style="font-size: 10px;"
+                                    class="course-enroll-btn Btn Btn--warning Btn-nation">Edit
+                                </a>
+                            </div>
+                            <div class="course-card-back__enroll">
+                                <button value="${nation._id}"
+                                    style="font-size: 10px;"
+                                    class="course-enroll-btn Btn Btn--danger Btn-nation"
+                                    data-bs-toggle="modal"
+                                    onclick="onClick(event)"
+                                    data-bs-target="#deleteNation">DELETE
+                                </button>
+                            </div>`
+                        html += `
+                                    </div >
+                                </div >
+                            </div >
+                        </li >`
+                    }
+                    // console.log("html: ", html);
+                    const listElement = document.querySelector('.course__list.row');
+                    if (html)
+                        listElement.innerHTML = html;
+                    else listElement.innerHTML = `
+                    <div class="alert alert-danger nation-message" role="alert">No nation found</div>`
+
+                    let paginationHtml = '';
+                    for (let i = 1; i <= nations.totalPage; i++) {
+
+                        if (nations.page != i) {
+                            paginationHtml += `<li>`;
+
+
+                            if (keyword === '')
+                                paginationHtml += `<a href="/nations?page=${i}">${i}</a></li>`;
+                            if (keyword !== '')
+                                paginationHtml +=
+                                    ` <a href="/nations?page=${i}&keyword=${nations.keyword}">${i}</a></li>`
+                        }
+                        if (nations.page == i) {
+                            paginationHtml +=
+                                `<li class="page-selected">`
+                            if (keyword === '')
+                                paginationHtml += `<a href="/nations?page=${i}">${i}</a></li>`;
+                            if (keyword !== '')
+                                paginationHtml += `<a href="/nations?page=${i}&keyword=${nations.keyword}">${i}</a></li>`;
+
+                        }
+                    }
+
+                    const pagination = document.querySelector('.pagination');
+                    if (nations.totalPage > 1) pagination.innerHTML = paginationHtml;
+                    else pagination.innerHTML = '';
+                },
+                error: function () {
+                },
+                complete: function (result) {
+                }
+            });
         }
     </script>
 

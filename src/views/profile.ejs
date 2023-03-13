@@ -152,19 +152,35 @@
                     <form action="/change-password?_method=put" method="post">
                         <div class="modal-body" style="width: 600px;">
                             <div class="mb-3">
-                                <label for="recipient-name" class="col-form-label">Current password:</label>
-                                <input required type="password" name="password" class="form-control"
-                                    id="recipient-name">
+                                <p id="old-password-message" style="color: red; margin-bottom: 0;" style="color: red;">
+                                </p>
+                                <div style="display: flex;">
+                                    <label style="width: 200px;" for="old-password" class="col-form-label">Current
+                                        password:</label>
+                                    <input required type="password" name="password" class="form-control"
+                                        onkeydown="checkChangePassword()" id="old-password">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="recipient-name" class="col-form-label">New password:</label>
-                                <input required type="password" name="newPassword" class="form-control"
-                                    id="recipient-name">
+                                <p id="new-password-message" style="color: red; margin-bottom: 0;" style="color: red;">
+                                </p>
+                                <div style="display: flex;">
+                                    <label style="width: 200px;" class="col-form-label" for="new-password">New
+                                        password:</label>
+                                    <input required type="password" name="newPassword" class="form-control"
+                                        id="new-password" onkeydown="checkChangePassword()">
+                                </div>
                             </div>
                             <div class="mb-3">
-                                <label for="recipient-name" class="col-form-label">Confirm password:</label>
-                                <input required type="password" name="confirmPassword" class="form-control"
-                                    id="recipient-name">
+                                <p id="confirm-password-message" style="color: red; margin-bottom: 0;">
+                                </p>
+                                <div style="display: flex;">
+                                    <label style="width: 200px;" class="col-form-label" for="confirm-password">Confirm
+                                        password:</label>
+
+                                    <input required type="password" name="confirmPassword" class="form-control"
+                                        id="confirm-password" onkeyup="checkChangePassword()">
+                                </div>
                             </div>
                         </div>
                         <div class="modal-footer">
@@ -193,6 +209,27 @@
                 reader.readAsDataURL(input.files[0]);
             }
         }
+
+        function checkChangePassword () {
+            const oldPassword = document.querySelector('#old-password').value;
+            const newPassword = document.querySelector('#new-password').value;
+            const confirmPassword = document.querySelector('#confirm-password').value;
+
+            const oldPasswordMessage = document.querySelector('#old-password-message');
+            const newPasswordMessage = document.querySelector('#new-password-message');
+            const confirmPasswordMessage = document.querySelector('#confirm-password-message');
+
+            console.log(oldPasswordMessage);
+
+            if (oldPassword.length < 6) oldPasswordMessage.innerHTML = 'Old password must be at least 6 characters';
+            else oldPasswordMessage.innerHTML = '';
+            if (newPassword.length < 6) newPasswordMessage.innerHTML = 'New password must be at least 6 characters';
+            else newPasswordMessage.innerHTML = '';
+            if (confirmPassword.length < 6) confirmPasswordMessage.innerHTML = 'Confirm password must be at least 6 characters';
+            else confirmPasswordMessage.innerHTML = '';
+
+        }
+
     </script>
 
 </html>

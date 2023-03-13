@@ -41,6 +41,42 @@ export const getAllPlayers = async (req, res) => {
   }
 };
 
+export const getAllPlayersAjax = async (req, res) => {
+  try {
+    if (req.role === 'guest') {
+      return res.render('login', { username: '', message: 'You must login to see players' });
+    }
+
+    const item = 3;
+    let page = req.query.page ? req.query.page : 1;
+    const keyword = req.query.keyword ? req.query.keyword : '';
+    const totalItem = await Player.countDocuments({ name: { $regex: keyword, $options: 'i' } });
+    const totalPage = Math.ceil(totalItem / item);
+    if (page > totalPage) page = totalPage;
+    if (page < 1) page = 1;
+    let players;
+    if (!keyword)
+      players = await Player.find()
+        .skip((page - 1) * item)
+        .limit(item)
+        .populate('nation', ['name', 'image'])
+        .sort({ createdAt: -1 });
+    else
+      players = await Player
+        .find({ name: { $regex: keyword, $options: 'i' } })
+        .skip((page - 1) * item)
+        .limit(item)
+        .populate('nation', ['name', 'image'])
+        .sort({ createdAt: -1 });
+
+    const nations = await Nation.find();
+    res.status(200).json({ players, nations, clubs, positions, role: req.role, page, keyword, totalPage });
+  } catch (err) {
+    console.log(err);
+    res.status(500).json(err);
+  }
+};
+
 export const getCaptains = async (req, res) => {
   try {
     const players = await Player.find({ isCaptain: true }).populate('nation', ['name', 'image']).sort({ createdAt: -1 });
